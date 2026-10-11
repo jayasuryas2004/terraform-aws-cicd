@@ -1,0 +1,67 @@
+
+name: Terraform AWS Manual Apply
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: "Type apply to authorize deployment"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    if: ${{ inputs.confirmation == 'apply' }}
+    runs-on: [self-hosted, linux, x64]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check Terraform version
+        run: terraform -version
+
+      - name: Initialize Terraform
+        run: terraform init -input=false
+
+      - name: Format check
+        run: terraform fmt -check -recursive
+
+      - name: Validate configuration
+        run: terraform validate
+
+      - name: Generate deployment plan
+        run: terraform plan -input=false -out=tfplan
+
+      - name: Save plan artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan
+          path: tfplan
+          retention-days: 1
+          if-no-files-found: error
+
+  apply:
+    if: ${{ inputs.confirmation == 'apply' }}
+    needs: plan
+    runs-on: [self-hosted, linux, x64]
+    environment: terraform-production
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize Terraform
+        run: terraform init -input=false
+
+      - name: Download reviewed plan artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: terraform-plan
+          path: .
+
+      - name: Apply saved plan
+        run: terraform apply -input=false tfplan
