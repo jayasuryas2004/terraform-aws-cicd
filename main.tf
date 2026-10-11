@@ -29,7 +29,7 @@ resource "aws_s3_bucket" "learning" {
   lifecycle {
     prevent_destroy = true
   }
-  
+
   tags = {
     Name        = "terraform-learning"
     Environment = "learning"
