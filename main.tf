@@ -20,7 +20,7 @@ provider "aws" {
   region = "ap-south-1"
 }
 
-
+data "aws_caller_identity" "current" {}
 
 
 resource "aws_s3_bucket" "learning" {
