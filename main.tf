@@ -26,6 +26,10 @@ data "aws_caller_identity" "current" {}
 resource "aws_s3_bucket" "learning" {
   bucket = "terraform-learning-454015599516"
 
+  lifecycle {
+    prevent_destroy = true
+  }
+  
   tags = {
     Name        = "terraform-learning"
     Environment = "learning"
