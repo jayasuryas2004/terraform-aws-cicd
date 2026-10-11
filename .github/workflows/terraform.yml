@@ -31,6 +31,9 @@ jobs:
       - name: Initialize Terraform
         run: terraform init -input=false
 
+      - name: Inspect Terraform state
+        run: terraform state list
+
       - name: Validate configuration
         run: terraform validate
 
