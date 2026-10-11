@@ -1,0 +1,38 @@
+
+name: Terraform AWS CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "**.tf"
+      - ".terraform.lock.hcl"
+      - ".github/workflows/terraform.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  terraform:
+    runs-on: [self-hosted, linux, x64]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check Terraform version
+        run: terraform -version
+
+      - name: Format check
+        run: terraform fmt -check -recursive
+
+      - name: Initialize Terraform
+        run: terraform init -input=false
+
+      - name: Validate configuration
+        run: terraform validate
+
+      - name: Preview changes
+        run: terraform plan -input=false
