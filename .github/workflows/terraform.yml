@@ -34,6 +34,9 @@ jobs:
       - name: Inspect Terraform state
         run: terraform state list
 
+      - name: Clear tainted status
+        run: terraform untaint aws_s3_bucket.learning
+
       - name: Validate configuration
         run: terraform validate
 
